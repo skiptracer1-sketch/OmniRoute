@@ -1,0 +1,82 @@
+name: OpenClaude Integration
+
+on:
+  push:
+    branches:
+      - feature/openclaude-runtime
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OMNIROUTE_SKIP_SYSTEM_TRUST: "1"
+      OMNIROUTE_NO_UPDATE_NOTIFIER: "1"
+      DISABLE_SQLITE_AUTO_BACKUP: "true"
+      JWT_SECRET: openclaude-ci-jwt-secret-long-enough
+      API_KEY_SECRET: openclaude-ci-api-secret-long-enough
+    steps:
+      - name: Checkout with OpenClaude submodule
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+
+      - name: Install OmniRoute dependencies
+        run: npm ci
+
+      - name: Run OpenClaude integration contract tests
+        run: >-
+          node --test
+          tests/unit/runtime/openclaudeBridge.test.mjs
+          tests/unit/runtime/openclaudeSmoke.test.mjs
+          tests/unit/cli/openclaudeCommand.test.mjs
+
+      - name: Install and build pinned OpenClaude
+        working-directory: integrations/openclaude
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+          node bin/openclaude --version
+
+      - name: Verify first-class OmniRoute launcher reaches OpenClaude
+        run: node bin/omniroute.mjs openclaude --skip-health-check -- --version
+
+      - name: Build OmniRoute release runtime
+        run: npm run build:release
+        env:
+          NODE_OPTIONS: "--max-old-space-size=12288"
+          OMNIROUTE_BUILD_MEMORY_MB: "12288"
+
+      - name: Start OmniRoute in background
+        run: node bin/omniroute.mjs serve --daemon --no-open --port 20128
+
+      - name: Wait for OmniRoute health
+        run: |
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://localhost:20128/api/monitoring/health >/dev/null; then
+              echo "OmniRoute is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "OmniRoute did not become healthy in time"
+          exit 1
+
+      - name: Run live OpenClaude-to-OmniRoute gateway smoke
+        run: node scripts/integrations/openclaude-smoke.mjs
