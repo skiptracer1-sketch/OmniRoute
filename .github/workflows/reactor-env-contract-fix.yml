@@ -1,0 +1,80 @@
+name: Reactor Env Contract Fix
+
+on:
+  push:
+    branches:
+      - release/v3.8.50
+    paths:
+      - .github/workflows/reactor-env-contract-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    name: Repair Reactor environment contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: release/v3.8.50
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Add Reactor environment variables to canonical docs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          env_path = Path('.env.example')
+          env_text = env_path.read_text()
+          env_block = '''
+
+# ── Reactor Native Integration ──
+# Server-only Reactor API key used to mint short-lived model-scoped tokens.
+# Never expose this value to browser/client code.
+# REACTOR_API_KEY=
+
+# Reactor token minting endpoint. Leave unset to use the official default.
+# Default: https://api.reactor.inc/tokens
+# REACTOR_TOKEN_ENDPOINT=https://api.reactor.inc/tokens
+
+# Maximum concurrent sessions authorized by each short-lived Reactor token.
+# Default: 2 | Valid range: 1-10
+# REACTOR_MAX_SESSIONS_PER_TOKEN=2
+'''
+          if 'REACTOR_API_KEY=' not in env_text:
+              env_path.write_text(env_text.rstrip() + env_block + '\n')
+
+          doc_path = Path('docs/reference/ENVIRONMENT.md')
+          doc_text = doc_path.read_text()
+          doc_block = '''
+
+## Reactor Native Integration
+
+`REACTOR_API_KEY` — Optional server-only Reactor credential used by OmniRoute to mint short-lived, model-scoped Reactor tokens. Keep this secret out of browser bundles, responses, and logs.
+
+`REACTOR_TOKEN_ENDPOINT` — Optional override for the Reactor token broker endpoint. Defaults to `https://api.reactor.inc/tokens`.
+
+`REACTOR_MAX_SESSIONS_PER_TOKEN` — Optional maximum session count placed on each minted Reactor token. Defaults to `2` and is clamped to the supported range of 1–10.
+'''
+          if '`REACTOR_API_KEY`' not in doc_text:
+              doc_path.write_text(doc_text.rstrip() + doc_block + '\n')
+          PY
+
+      - name: Verify strict environment documentation contract
+        run: node scripts/check/check-env-doc-sync.mjs
+
+      - name: Commit repair
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "Environment contract already repaired."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .env.example docs/reference/ENVIRONMENT.md
+          git commit -m "docs: register Reactor environment variables"
+          git push origin HEAD:release/v3.8.50
