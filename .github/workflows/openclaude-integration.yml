@@ -82,7 +82,16 @@ jobs:
           exit 1
 
       - name: Run live OpenClaude-to-OmniRoute gateway smoke
-        run: node scripts/integrations/openclaude-smoke.mjs
+        run: |
+          node --input-type=module -e '
+            import { smokeOpenClaudeGateway } from "./scripts/integrations/openclaude-smoke.mjs";
+            const result = await smokeOpenClaudeGateway({ timeoutMs: 30000 });
+            if (!result.ok) {
+              console.error(`OpenClaude gateway smoke failed at ${result.stage}: ${result.error}`);
+              process.exit(1);
+            }
+            console.log(`OpenClaude gateway smoke passed: model=${result.model}, reply=${JSON.stringify(result.content)}`);
+          '
 
       - name: Dump OmniRoute log on failure
         if: failure()
