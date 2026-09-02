@@ -19,6 +19,7 @@ jobs:
       DISABLE_SQLITE_AUTO_BACKUP: "true"
       JWT_SECRET: openclaude-ci-jwt-secret-long-enough
       API_KEY_SECRET: openclaude-ci-api-secret-long-enough
+      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - name: Checkout with OpenClaude submodule
         uses: actions/checkout@v7
@@ -57,26 +58,32 @@ jobs:
       - name: Verify first-class OmniRoute launcher reaches OpenClaude
         run: node bin/omniroute.mjs openclaude --skip-health-check -- --version
 
-      - name: Build OmniRoute release runtime
-        run: npm run build:release
-        env:
-          NODE_OPTIONS: "--max-old-space-size=12288"
-          OMNIROUTE_BUILD_MEMORY_MB: "12288"
-
-      - name: Start OmniRoute in background
-        run: node bin/omniroute.mjs serve --daemon --no-open --port 20128
+      - name: Start OmniRoute dev gateway in background
+        run: |
+          nohup npm run dev > /tmp/omniroute-openclaude.log 2>&1 &
+          echo $! > /tmp/omniroute-openclaude.pid
 
       - name: Wait for OmniRoute health
         run: |
-          for i in $(seq 1 60); do
+          for i in $(seq 1 90); do
             if curl --fail --silent http://localhost:20128/api/monitoring/health >/dev/null; then
               echo "OmniRoute is healthy"
               exit 0
             fi
+            if ! kill -0 "$(cat /tmp/omniroute-openclaude.pid)" 2>/dev/null; then
+              echo "OmniRoute dev process exited early"
+              cat /tmp/omniroute-openclaude.log || true
+              exit 1
+            fi
             sleep 2
           done
           echo "OmniRoute did not become healthy in time"
+          cat /tmp/omniroute-openclaude.log || true
           exit 1
 
       - name: Run live OpenClaude-to-OmniRoute gateway smoke
         run: node scripts/integrations/openclaude-smoke.mjs
+
+      - name: Dump OmniRoute log on failure
+        if: failure()
+        run: cat /tmp/omniroute-openclaude.log || true
