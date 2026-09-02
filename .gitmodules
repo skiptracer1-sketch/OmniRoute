@@ -1,0 +1,4 @@
+[submodule "integrations/openclaude"]
+	path = integrations/openclaude
+	url = https://github.com/Gitlawb/openclaude.git
+	branch = main
