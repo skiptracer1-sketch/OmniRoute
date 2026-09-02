@@ -1,0 +1,41 @@
+name: Reactor Native Verify
+
+on:
+  push:
+    branches:
+      - feature/reactor-native-v2
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reactor-verify:
+    name: Reactor lint, typecheck, tests
+    runs-on: ubuntu-latest
+    env:
+      CI_NODE_VERSION: "24"
+      JWT_SECRET: reactor-ci-secret-with-sufficient-length
+      API_KEY_SECRET: reactor-ci-api-key-secret-long
+      DISABLE_SQLITE_AUTO_BACKUP: "true"
+      OMNIROUTE_SKIP_SYSTEM_TRUST: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.CI_NODE_VERSION }}
+          cache: npm
+      - uses: ./.github/actions/npm-ci-retry
+      - name: Lint Reactor files
+        run: npx eslint src/lib/reactor src/app/api/reactor tests/unit/lib/reactor
+      - name: Core typecheck
+        run: npm run typecheck:core
+      - name: Reactor unit tests
+        run: >-
+          node --import tsx/esm
+          --import ./open-sse/utils/setupPolyfill.ts
+          --import ./tests/_setup/isolateDataDir.ts
+          --test
+          tests/unit/lib/reactor/*.test.ts
