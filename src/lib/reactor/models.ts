@@ -38,11 +38,20 @@ export const REACTOR_MODELS = {
   },
   x2: {
     id: "x2",
-    reactorModel: "reactor/x2",
+    reactorModel: "xmax/x2",
     displayName: "X2 Real-Time Video Transform",
     capability: "video-transform",
     sdkPackage: "@reactor-models/x2",
-    commands: ["start", "stop", "pause", "resume", "reset", "setPrompt"],
+    commands: [
+      "reset",
+      "setPrompt",
+      "setPointer",
+      "setPointerX",
+      "setPointerY",
+      "setKeepBacklog",
+      "setPointerActive",
+      "setReferenceImage",
+    ],
     tracks: [
       { name: "source", kind: "video", direction: "in" },
       { name: "main_video", kind: "video", direction: "out" },
