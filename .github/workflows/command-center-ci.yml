@@ -1,0 +1,36 @@
+name: Command Center CI
+
+on:
+  pull_request:
+    branches: [release/v3.8.50]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'src/app/(dashboard)/dashboard/command-center/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: command-center-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dashboard-typecheck:
+    name: Command Center Typecheck
+    runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: ci-command-center-secret-with-sufficient-length
+      API_KEY_SECRET: ci-command-center-api-key-secret-long
+      DISABLE_SQLITE_AUTO_BACKUP: 'true'
+      OMNIROUTE_SKIP_SYSTEM_TRUST: '1'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: ./.github/actions/npm-ci-retry
+      - run: npm run check:dashboard-typecheck
