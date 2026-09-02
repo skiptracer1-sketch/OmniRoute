@@ -1487,3 +1487,12 @@ Long-lived SSE consumer that mirrors OmniConductor hub tasks into the local A2A 
 | `CONDUCTOR_HUB_TOKEN` | _(empty)_  | `src/lib/conductor/boot.ts`  | Hub credential for the SSE feed — emit a `spokesperson`-kind peer on the hub (`POST /v1/peers`, admin).  |
 | `CONDUCTOR_ORCHESTRATOR_TOKEN` | _(empty)_ | `src/lib/conductor/hubProxy.ts` | Credential for inbound A2A→hub task delegation (`POST /v1/tasks`); falls back to `CONDUCTOR_HUB_TOKEN` when unset. |
 | `CONDUCTOR_SPOKESPERSON_URL` | `http://127.0.0.1:7920` | `src/lib/conductor/faroProxy.ts` | Base URL of the spokesperson (Faro) service behind the dashboard chat proxy (`/api/conductor/ask`). |
+
+## Reactor Native Integration
+
+`REACTOR_API_KEY` — Optional server-only Reactor credential used to mint short-lived, model-scoped tokens. Never expose it to browser code, responses, or logs.
+
+`REACTOR_TOKEN_ENDPOINT` — Optional token broker endpoint override. Defaults to https://api.reactor.inc/tokens.
+
+`REACTOR_MAX_SESSIONS_PER_TOKEN` — Optional maximum sessions authorized by each minted token. Defaults to 2 and is clamped to 1–10.
+
