@@ -4,6 +4,7 @@ import { buildHealthPayload } from "@/lib/monitoring/observability";
 import { APP_CONFIG } from "@/shared/constants/config";
 import { AI_PROVIDERS } from "@/shared/constants/providers";
 import { isAuthenticated } from "@/shared/utils/apiAuth";
+import { getLumexusAstraRuntimeStatus } from "@omniroute/open-sse/services/lumexusAstraRouting";
 
 /**
  * GET /api/monitoring/health — System health overview
@@ -181,9 +182,13 @@ export async function GET() {
       credentialHealth,
       adaptiveAdmission,
     });
+    const responsePayload = {
+      ...payload,
+      lumexusAstra: getLumexusAstraRuntimeStatus(lockouts),
+    };
 
-    healthPayloadCache = { payload, expiresAt: Date.now() + HEALTH_PAYLOAD_TTL_MS };
-    return NextResponse.json(payload);
+    healthPayloadCache = { payload: responsePayload, expiresAt: Date.now() + HEALTH_PAYLOAD_TTL_MS };
+    return NextResponse.json(responsePayload);
   } catch (error) {
     console.error("[API] GET /api/monitoring/health error:", error);
     return NextResponse.json({
@@ -199,6 +204,7 @@ export async function GET() {
       sessions: { activeCount: 0, stickyBoundCount: 0, byApiKey: {}, top: [] },
       adaptiveAdmission: null,
       dedup: { inflightRequests: 0 },
+      lumexusAstra: getLumexusAstraRuntimeStatus([]),
     });
   }
 }
