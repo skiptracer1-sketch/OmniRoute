@@ -18,9 +18,10 @@ export function resolveOpenClaudeTarget(opts = {}) {
 export function buildOpenClaudeBridgeEnv(baseEnv = process.env, target) {
   return {
     ...baseEnv,
-    OMNIROUTE_OPENCLAUDE_BASE_URL: target.baseUrl,
-    OMNIROUTE_OPENCLAUDE_MODEL: target.model,
-    OMNIROUTE_OPENCLAUDE_API_KEY: target.apiKey,
+    CLAUDE_CODE_USE_OPENAI: "1",
+    OPENAI_BASE_URL: target.baseUrl,
+    OPENAI_MODEL: target.model,
+    OPENAI_API_KEY: target.apiKey,
   };
 }
 
