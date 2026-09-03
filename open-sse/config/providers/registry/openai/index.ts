@@ -11,6 +11,10 @@ export const openaiProvider: RegistryEntry = {
   authHeader: "bearer",
   defaultContextLength: 128000,
   models: [
+    // Lumexus candidate: OpenAI publicly references GPT-6 Astra, while the public API
+    // model catalog does not yet publish an Astra model ID. Keep the candidate explicit
+    // and unverified; exact-model lockout + modelFamilyFallback safely degrades to Sol.
+    { id: "gpt-6-astra", name: "GPT-6 Astra (candidate API ID)" },
     { id: "gpt-5.6", name: "GPT-5.6", ...GPT_5_6_API_CAPABILITIES },
     { id: "gpt-5.6-sol", name: "GPT-5.6 Sol", ...GPT_5_6_API_CAPABILITIES },
     { id: "gpt-5.6-terra", name: "GPT-5.6 Terra", ...GPT_5_6_API_CAPABILITIES },
