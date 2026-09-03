@@ -8,20 +8,27 @@ function stripTrailingSlash(value) {
 }
 
 export function resolveOpenClaudeTarget(opts = {}) {
-  const baseUrl = opts.baseUrl || opts["base-url"] || DEFAULT_BASE_URL;
-  const model = opts.model || DEFAULT_MODEL;
+  const baseUrl =
+    opts.baseUrl ||
+    opts["base-url"] ||
+    process.env.OMNIROUTE_OPENCLAUDE_BASE_URL ||
+    DEFAULT_BASE_URL;
+  const model = opts.model || process.env.OMNIROUTE_OPENCLAUDE_MODEL || DEFAULT_MODEL;
   const apiKey =
-    opts.apiKey || opts["api-key"] || process.env.OMNIROUTE_API_KEY || "omniroute-local";
+    opts.apiKey ||
+    opts["api-key"] ||
+    process.env.OMNIROUTE_OPENCLAUDE_API_KEY ||
+    process.env.OMNIROUTE_API_KEY ||
+    "omniroute-local";
   return { baseUrl: stripTrailingSlash(baseUrl), model, apiKey };
 }
 
 export function buildOpenClaudeBridgeEnv(baseEnv = process.env, target) {
   return {
     ...baseEnv,
-    CLAUDE_CODE_USE_OPENAI: "1",
-    OPENAI_BASE_URL: target.baseUrl,
-    OPENAI_MODEL: target.model,
-    OPENAI_API_KEY: target.apiKey,
+    OMNIROUTE_OPENCLAUDE_BASE_URL: target.baseUrl,
+    OMNIROUTE_OPENCLAUDE_MODEL: target.model,
+    OMNIROUTE_OPENCLAUDE_API_KEY: target.apiKey,
   };
 }
 
