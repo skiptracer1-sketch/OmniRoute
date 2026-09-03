@@ -57,9 +57,9 @@ export async function smokeOpenClaudeGateway(options = {}) {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const result = await smokeOpenClaudeGateway({
-    baseUrl: process.env.OMNIROUTE_OPENCLAUDE_BASE_URL || DEFAULT_BASE_URL,
-    model: process.env.OMNIROUTE_OPENCLAUDE_MODEL || DEFAULT_MODEL,
-    apiKey: process.env.OMNIROUTE_OPENCLAUDE_API_KEY || process.env.OMNIROUTE_API_KEY,
+    baseUrl: process.env.OPENAI_BASE_URL || DEFAULT_BASE_URL,
+    model: process.env.OPENAI_MODEL || DEFAULT_MODEL,
+    apiKey: process.env.OPENAI_API_KEY || process.env.OMNIROUTE_API_KEY,
   });
   if (result.ok) {
     console.log(`OpenClaude gateway smoke passed: model=${result.model}, reply=${JSON.stringify(result.content)}`);
