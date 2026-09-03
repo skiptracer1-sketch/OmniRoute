@@ -12,9 +12,10 @@ import {
   getLumexusAstraRuntimeStatus,
 } from "../../../open-sse/services/lumexusAstraRouting.ts";
 
-test("OpenAI registry exposes the Astra candidate ahead of the verified Sol fallback", () => {
+test("OpenAI registry exposes Astra without replacing the verified default ordering", () => {
   const ids = openaiProvider.models.map((model) => model.id);
-  assert.equal(ids[0], LUMEXUS_ASTRA_CANDIDATE_MODEL);
+  assert.equal(ids[0], "gpt-5.6");
+  assert.ok(ids.includes(LUMEXUS_ASTRA_CANDIDATE_MODEL));
   assert.ok(ids.includes(LUMEXUS_FALLBACK_MODEL));
 });
 
