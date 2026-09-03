@@ -8,18 +8,10 @@ function stripTrailingSlash(value) {
 }
 
 export function resolveOpenClaudeTarget(opts = {}) {
-  const baseUrl =
-    opts.baseUrl ||
-    opts["base-url"] ||
-    process.env.OMNIROUTE_OPENCLAUDE_BASE_URL ||
-    DEFAULT_BASE_URL;
-  const model = opts.model || process.env.OMNIROUTE_OPENCLAUDE_MODEL || DEFAULT_MODEL;
+  const baseUrl = opts.baseUrl || opts["base-url"] || DEFAULT_BASE_URL;
+  const model = opts.model || DEFAULT_MODEL;
   const apiKey =
-    opts.apiKey ||
-    opts["api-key"] ||
-    process.env.OMNIROUTE_OPENCLAUDE_API_KEY ||
-    process.env.OMNIROUTE_API_KEY ||
-    "omniroute-local";
+    opts.apiKey || opts["api-key"] || process.env.OMNIROUTE_API_KEY || "omniroute-local";
   return { baseUrl: stripTrailingSlash(baseUrl), model, apiKey };
 }
 
