@@ -15,7 +15,49 @@ const POLL_MS = 5000;
 
 function formatCheckedAt(value: Date | null) {
   if (!value) return "Waiting for first probe";
-  return `Checked ${value.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+  return `Checked ${value.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  })}`;
+}
+
+function getStateLabel(state: HealthState) {
+  if (state === "online") return "ONLINE";
+  if (state === "offline") return "OFFLINE";
+  return "CHECKING";
+}
+
+function getDialValue(state: HealthState) {
+  if (state === "online") return 360;
+  if (state === "checking") return 72;
+  return 0;
+}
+
+function getDialText(snapshot: HealthSnapshot) {
+  if (snapshot.state === "offline") return "OFF";
+  if (snapshot.state === "checking") return "…";
+  if (snapshot.latencyMs == null) return "ON";
+  return String(snapshot.latencyMs);
+}
+
+function getAriaLabel(snapshot: HealthSnapshot) {
+  if (snapshot.state === "offline") return "OmniRoute gateway offline";
+  if (snapshot.state === "checking") return "OmniRoute gateway health check in progress";
+  if (snapshot.latencyMs == null) return "OmniRoute gateway online";
+  return `OmniRoute gateway online, ${snapshot.latencyMs} millisecond probe latency`;
+}
+
+function getStatusDotClass(state: HealthState) {
+  if (state === "online") return "bg-green-500";
+  if (state === "offline") return "bg-red-500";
+  return "bg-amber-500 animate-pulse";
+}
+
+function getGatewayLabel(state: HealthState) {
+  if (state === "online") return "Healthy";
+  if (state === "offline") return "Unavailable";
+  return "Probing";
 }
 
 export default function RuntimePulse() {
@@ -49,24 +91,9 @@ export default function RuntimePulse() {
     return () => clearInterval(timer);
   }, [probe]);
 
-  const stateLabel =
-    snapshot.state === "online" ? "ONLINE" : snapshot.state === "offline" ? "OFFLINE" : "CHECKING";
-  const dialValue = snapshot.state === "online" ? 360 : snapshot.state === "checking" ? 72 : 0;
-  const dialText =
-    snapshot.state === "online"
-      ? snapshot.latencyMs == null
-        ? "ON"
-        : `${snapshot.latencyMs}`
-      : snapshot.state === "offline"
-        ? "OFF"
-        : "…";
   const dialUnit = snapshot.state === "online" && snapshot.latencyMs != null ? "ms" : "status";
-  const ariaLabel =
-    snapshot.state === "online"
-      ? `OmniRoute gateway online${snapshot.latencyMs == null ? "" : `, ${snapshot.latencyMs} millisecond probe latency`}`
-      : snapshot.state === "offline"
-        ? "OmniRoute gateway offline"
-        : "OmniRoute gateway health check in progress";
+  const checkingClass = snapshot.state === "checking" ? "animate-pulse" : "";
+  const openClaudeRoute = snapshot.state === "online" ? "Gateway reachable" : "Gateway unavailable";
 
   return (
     <Card>
@@ -95,32 +122,24 @@ export default function RuntimePulse() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[220px_1fr]">
           <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-bg-subtle p-5">
             <div
-              className={`relative flex size-36 items-center justify-center rounded-full ${
-                snapshot.state === "checking" ? "animate-pulse" : ""
-              }`}
+              className={`relative flex size-36 items-center justify-center rounded-full ${checkingClass}`}
               style={{
-                background: `conic-gradient(var(--color-primary, currentColor) ${dialValue}deg, color-mix(in srgb, currentColor 10%, transparent) 0deg)`,
+                background: `conic-gradient(var(--color-primary, currentColor) ${getDialValue(snapshot.state)}deg, color-mix(in srgb, currentColor 10%, transparent) 0deg)`,
               }}
-              aria-label={ariaLabel}
+              aria-label={getAriaLabel(snapshot)}
             >
               <div className="flex size-28 flex-col items-center justify-center rounded-full border border-border bg-bg-main">
-                <span className="text-3xl font-black tabular-nums text-text-main">{dialText}</span>
+                <span className="text-3xl font-black tabular-nums text-text-main">
+                  {getDialText(snapshot)}
+                </span>
                 <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted">
                   {dialUnit}
                 </span>
               </div>
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs font-semibold">
-              <span
-                className={`size-2 rounded-full ${
-                  snapshot.state === "online"
-                    ? "bg-green-500"
-                    : snapshot.state === "offline"
-                      ? "bg-red-500"
-                      : "bg-amber-500 animate-pulse"
-                }`}
-              />
-              {stateLabel}
+              <span className={`size-2 rounded-full ${getStatusDotClass(snapshot.state)}`} />
+              {getStateLabel(snapshot.state)}
             </div>
           </div>
 
@@ -128,7 +147,7 @@ export default function RuntimePulse() {
             <div className="rounded-xl border border-border bg-bg-subtle p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Gateway</p>
               <p className="mt-2 text-base font-semibold text-text-main">
-                {snapshot.state === "online" ? "Healthy" : snapshot.state === "offline" ? "Unavailable" : "Probing"}
+                {getGatewayLabel(snapshot.state)}
               </p>
               <p className="mt-1 text-xs text-text-muted">/api/monitoring/health</p>
             </div>
@@ -143,9 +162,7 @@ export default function RuntimePulse() {
 
             <div className="rounded-xl border border-border bg-bg-subtle p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">OpenClaude route</p>
-              <p className="mt-2 text-base font-semibold text-text-main">
-                {snapshot.state === "online" ? "Gateway reachable" : "Gateway unavailable"}
-              </p>
+              <p className="mt-2 text-base font-semibold text-text-main">{openClaudeRoute}</p>
               <p className="mt-1 text-xs text-text-muted">
                 Configured for OmniRoute /v1; OpenClaude process status is not independently probed here.
               </p>
