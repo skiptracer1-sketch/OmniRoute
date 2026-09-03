@@ -20,6 +20,10 @@ import {
 } from "./errorClassifier.ts";
 import { getRegistryEntry } from "../config/providerRegistry.ts";
 import { isModelSelectable } from "./modelLifecycle.ts";
+import {
+  LUMEXUS_ASTRA_CANDIDATE_MODEL,
+  LUMEXUS_FALLBACK_MODEL,
+} from "./lumexusAstraRouting.ts";
 
 // ── Model Family Definitions ─────────────────────────────────────────────────
 
@@ -28,6 +32,11 @@ import { isModelSelectable } from "./modelLifecycle.ts";
  * First entry is the most preferred; fallback proceeds in order.
  */
 const FAMILY_FALLBACK_TEMPLATES: Record<string, readonly string[]> = {
+  // Lumexus premium lane — Astra's public API model id is not catalog-verified yet.
+  // If the candidate is unavailable or unauthorized, fall through to the verified
+  // GPT-5.6 Sol model without locking unrelated OpenAI models.
+  [LUMEXUS_ASTRA_CANDIDATE_MODEL]: [LUMEXUS_FALLBACK_MODEL],
+
   // Gemini 3 / 3.1 Pro family — ordered by preference
   "gemini-3-pro": [
     "gemini-3.1-pro-preview",
