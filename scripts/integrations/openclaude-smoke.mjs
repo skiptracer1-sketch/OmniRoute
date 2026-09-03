@@ -1,3 +1,5 @@
+import { buildOpenClaudeEnv } from "./openclaude-bridge.mjs";
+
 const DEFAULT_BASE_URL = "http://localhost:20128/v1";
 const DEFAULT_MODEL = "auto";
 
@@ -56,10 +58,14 @@ export async function smokeOpenClaudeGateway(options = {}) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
+  const bridgeEnv = buildOpenClaudeEnv({
+    ...process.env,
+    OPENAI_API_KEY: process.env.OMNIROUTE_API_KEY,
+  });
   const result = await smokeOpenClaudeGateway({
-    baseUrl: process.env.OPENAI_BASE_URL || DEFAULT_BASE_URL,
-    model: process.env.OPENAI_MODEL || DEFAULT_MODEL,
-    apiKey: process.env.OPENAI_API_KEY || process.env.OMNIROUTE_API_KEY,
+    baseUrl: bridgeEnv.OPENAI_BASE_URL,
+    model: bridgeEnv.OPENAI_MODEL,
+    apiKey: bridgeEnv.OPENAI_API_KEY,
   });
   if (result.ok) {
     console.log(`OpenClaude gateway smoke passed: model=${result.model}, reply=${JSON.stringify(result.content)}`);
