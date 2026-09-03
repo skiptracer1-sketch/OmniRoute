@@ -5,10 +5,27 @@ import { Card } from "@/shared/components";
 
 type HealthState = "checking" | "online" | "offline";
 
+type LumexusAstraStatus = {
+  provider: "openai";
+  candidateModel: string;
+  fallbackModel: string;
+  apiModelIdVerified: false;
+  state: "candidate_unverified" | "candidate_locked";
+  fallbackActive: boolean;
+  lockoutReason: string | null;
+  lockoutRemainingMs: number | null;
+  failureCount: number;
+};
+
 type HealthSnapshot = {
   state: HealthState;
   latencyMs: number | null;
   checkedAt: Date | null;
+  astra: LumexusAstraStatus | null;
+};
+
+type HealthPayload = {
+  lumexusAstra?: LumexusAstraStatus;
 };
 
 const POLL_MS = 5000;
@@ -60,11 +77,30 @@ function getGatewayLabel(state: HealthState) {
   return "Probing";
 }
 
+function getAstraLabel(status: LumexusAstraStatus | null) {
+  if (!status) return "Telemetry unavailable";
+  if (status.state === "candidate_locked") return "Sol fallback active";
+  return "Astra candidate ready";
+}
+
+function getAstraDetail(status: LumexusAstraStatus | null) {
+  if (!status) return "Astra routing telemetry is not available from the gateway.";
+  if (status.state === "candidate_locked") {
+    const cooldownSeconds =
+      status.lockoutRemainingMs == null ? null : Math.ceil(status.lockoutRemainingMs / 1000);
+    const cooldownText = cooldownSeconds == null ? "" : ` for ~${cooldownSeconds}s`;
+    const reasonText = status.lockoutReason ? ` (${status.lockoutReason})` : "";
+    return `${status.candidateModel} is cooling down${cooldownText}${reasonText}; routing falls through to ${status.fallbackModel}.`;
+  }
+  return `${status.candidateModel} is configured as an unverified API candidate; ${status.fallbackModel} is the verified fallback.`;
+}
+
 export default function RuntimePulse() {
   const [snapshot, setSnapshot] = useState<HealthSnapshot>({
     state: "checking",
     latencyMs: null,
     checkedAt: null,
+    astra: null,
   });
 
   const probe = useCallback(async () => {
@@ -75,13 +111,22 @@ export default function RuntimePulse() {
         signal: AbortSignal.timeout(4000),
       });
       const latencyMs = Math.max(1, Math.round(performance.now() - started));
+      const payload = response.ok
+        ? ((await response.json().catch(() => null)) as HealthPayload | null)
+        : null;
       setSnapshot({
         state: response.ok ? "online" : "offline",
         latencyMs,
         checkedAt: new Date(),
+        astra: payload?.lumexusAstra ?? null,
       });
     } catch {
-      setSnapshot({ state: "offline", latencyMs: null, checkedAt: new Date() });
+      setSnapshot({
+        state: "offline",
+        latencyMs: null,
+        checkedAt: new Date(),
+        astra: null,
+      });
     }
   }, []);
 
@@ -93,7 +138,8 @@ export default function RuntimePulse() {
 
   const dialUnit = snapshot.state === "online" && snapshot.latencyMs != null ? "ms" : "status";
   const checkingClass = snapshot.state === "checking" ? "animate-pulse" : "";
-  const openClaudeRoute = snapshot.state === "online" ? "Gateway reachable" : "Gateway unavailable";
+  const openClaudeRoute =
+    snapshot.state === "online" ? "Gateway reachable" : "Gateway unavailable";
 
   return (
     <Card>
@@ -143,7 +189,7 @@ export default function RuntimePulse() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-xl border border-border bg-bg-subtle p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Gateway</p>
               <p className="mt-2 text-base font-semibold text-text-main">
@@ -153,7 +199,9 @@ export default function RuntimePulse() {
             </div>
 
             <div className="rounded-xl border border-border bg-bg-subtle p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Probe latency</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                Probe latency
+              </p>
               <p className="mt-2 text-base font-semibold tabular-nums text-text-main">
                 {snapshot.latencyMs == null ? "—" : `${snapshot.latencyMs} ms`}
               </p>
@@ -161,18 +209,32 @@ export default function RuntimePulse() {
             </div>
 
             <div className="rounded-xl border border-border bg-bg-subtle p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">OpenClaude route</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                OpenClaude route
+              </p>
               <p className="mt-2 text-base font-semibold text-text-main">{openClaudeRoute}</p>
               <p className="mt-1 text-xs text-text-muted">
-                Configured for OmniRoute /v1; OpenClaude process status is not independently probed here.
+                Configured for OmniRoute /v1; OpenClaude process status is not independently
+                probed here.
               </p>
             </div>
 
-            <div className="rounded-xl border border-border bg-bg-subtle p-4 sm:col-span-2 xl:col-span-3">
+            <div className="rounded-xl border border-border bg-bg-subtle p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                Lumexus premium route
+              </p>
+              <p className="mt-2 text-base font-semibold text-text-main">
+                {getAstraLabel(snapshot.astra)}
+              </p>
+              <p className="mt-1 text-xs text-text-muted">{getAstraDetail(snapshot.astra)}</p>
+            </div>
+
+            <div className="rounded-xl border border-border bg-bg-subtle p-4 sm:col-span-2 xl:col-span-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-xs text-text-muted">{formatCheckedAt(snapshot.checkedAt)}</p>
                 <p className="text-xs font-medium text-text-muted">
-                  Only gateway health and probe latency are measured. Agent/job progress requires persisted runtime events.
+                  Astra status reflects OmniRoute model-lockout telemetry only. It does not claim
+                  OpenAI API entitlement or independently verify the candidate model ID.
                 </p>
               </div>
             </div>
