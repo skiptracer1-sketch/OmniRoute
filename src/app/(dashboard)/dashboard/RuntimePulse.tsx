@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/shared/components";
 
 type HealthState = "checking" | "online" | "offline";
@@ -49,18 +49,24 @@ export default function RuntimePulse() {
     return () => clearInterval(timer);
   }, [probe]);
 
-  const readiness = useMemo(() => {
-    if (snapshot.state === "checking") return 25;
-    if (snapshot.state === "offline") return 0;
-    if (snapshot.latencyMs == null) return 80;
-    if (snapshot.latencyMs <= 150) return 100;
-    if (snapshot.latencyMs <= 500) return 92;
-    if (snapshot.latencyMs <= 1000) return 82;
-    return 70;
-  }, [snapshot]);
-
   const stateLabel =
     snapshot.state === "online" ? "ONLINE" : snapshot.state === "offline" ? "OFFLINE" : "CHECKING";
+  const dialValue = snapshot.state === "online" ? 360 : snapshot.state === "checking" ? 72 : 0;
+  const dialText =
+    snapshot.state === "online"
+      ? snapshot.latencyMs == null
+        ? "ON"
+        : `${snapshot.latencyMs}`
+      : snapshot.state === "offline"
+        ? "OFF"
+        : "…";
+  const dialUnit = snapshot.state === "online" && snapshot.latencyMs != null ? "ms" : "status";
+  const ariaLabel =
+    snapshot.state === "online"
+      ? `OmniRoute gateway online${snapshot.latencyMs == null ? "" : `, ${snapshot.latencyMs} millisecond probe latency`}`
+      : snapshot.state === "offline"
+        ? "OmniRoute gateway offline"
+        : "OmniRoute gateway health check in progress";
 
   return (
     <Card>
@@ -72,7 +78,7 @@ export default function RuntimePulse() {
               <h2 className="text-lg font-semibold">Runtime Pulse</h2>
             </div>
             <p className="mt-1 text-sm text-text-muted">
-              Live OmniRoute gateway readiness and OpenClaude bridge status.
+              Live OmniRoute gateway health and routing-path telemetry.
             </p>
           </div>
 
@@ -89,16 +95,18 @@ export default function RuntimePulse() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[220px_1fr]">
           <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-bg-subtle p-5">
             <div
-              className="relative flex size-36 items-center justify-center rounded-full"
+              className={`relative flex size-36 items-center justify-center rounded-full ${
+                snapshot.state === "checking" ? "animate-pulse" : ""
+              }`}
               style={{
-                background: `conic-gradient(var(--color-primary, currentColor) ${readiness * 3.6}deg, color-mix(in srgb, currentColor 10%, transparent) 0deg)`,
+                background: `conic-gradient(var(--color-primary, currentColor) ${dialValue}deg, color-mix(in srgb, currentColor 10%, transparent) 0deg)`,
               }}
-              aria-label={`Runtime readiness ${readiness}%`}
+              aria-label={ariaLabel}
             >
-              <div className="flex size-28 flex-col items-center justify-center rounded-full bg-bg-main border border-border">
-                <span className="text-3xl font-black tabular-nums text-text-main">{readiness}%</span>
+              <div className="flex size-28 flex-col items-center justify-center rounded-full border border-border bg-bg-main">
+                <span className="text-3xl font-black tabular-nums text-text-main">{dialText}</span>
                 <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted">
-                  readiness
+                  {dialUnit}
                 </span>
               </div>
             </div>
@@ -126,26 +134,28 @@ export default function RuntimePulse() {
             </div>
 
             <div className="rounded-xl border border-border bg-bg-subtle p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Latency</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Probe latency</p>
               <p className="mt-2 text-base font-semibold tabular-nums text-text-main">
                 {snapshot.latencyMs == null ? "—" : `${snapshot.latencyMs} ms`}
               </p>
-              <p className="mt-1 text-xs text-text-muted">5-second live probe cadence</p>
+              <p className="mt-1 text-xs text-text-muted">Measured every 5 seconds</p>
             </div>
 
             <div className="rounded-xl border border-border bg-bg-subtle p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">OpenClaude</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">OpenClaude route</p>
               <p className="mt-2 text-base font-semibold text-text-main">
-                {snapshot.state === "online" ? "Bridge ready" : "Waiting for gateway"}
+                {snapshot.state === "online" ? "Gateway reachable" : "Gateway unavailable"}
               </p>
-              <p className="mt-1 text-xs text-text-muted">Route: auto via OmniRoute /v1</p>
+              <p className="mt-1 text-xs text-text-muted">
+                Configured for OmniRoute /v1; OpenClaude process status is not independently probed here.
+              </p>
             </div>
 
             <div className="rounded-xl border border-border bg-bg-subtle p-4 sm:col-span-2 xl:col-span-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-xs text-text-muted">{formatCheckedAt(snapshot.checkedAt)}</p>
                 <p className="text-xs font-medium text-text-muted">
-                  This gauge reports measured gateway readiness; it does not invent task-completion percentages.
+                  Only gateway health and probe latency are measured. Agent/job progress requires persisted runtime events.
                 </p>
               </div>
             </div>
