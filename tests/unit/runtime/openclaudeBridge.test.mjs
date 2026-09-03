@@ -11,11 +11,11 @@ test('buildOpenClaudeEnv points OpenClaude at OmniRoute by default', () => {
   assert.equal(env.OPENAI_API_KEY, 'omniroute-local');
 });
 
-test('buildOpenClaudeEnv respects explicit OmniRoute overrides', () => {
+test('buildOpenClaudeEnv respects explicit OpenAI overrides', () => {
   const env = buildOpenClaudeEnv({
-    OMNIROUTE_OPENCLAUDE_BASE_URL: 'http://127.0.0.1:9999/v1',
-    OMNIROUTE_OPENCLAUDE_MODEL: 'openai/gpt-5',
-    OMNIROUTE_OPENCLAUDE_API_KEY: 'secret',
+    OPENAI_BASE_URL: 'http://127.0.0.1:9999/v1',
+    OPENAI_MODEL: 'openai/gpt-5',
+    OPENAI_API_KEY: 'secret',
   });
   assert.equal(env.OPENAI_BASE_URL, 'http://127.0.0.1:9999/v1');
   assert.equal(env.OPENAI_MODEL, 'openai/gpt-5');
