@@ -203,6 +203,12 @@ const IGNORE_FROM_CODE = new Set([
   // Test-only override: points setup-open-code.mjs at a fixture plugin dir without
   // requiring the real bundled plugin to be built.
   "OMNIROUTE_OPENCODE_PLUGIN_DIR",
+  // OpenClaude is an optional launcher/submodule bridge, not a core OmniRoute server
+  // environment contract. Its three bridge knobs are documented in
+  // docs/integrations/openclaude.md alongside setup, security, and launch guidance.
+  "OMNIROUTE_OPENCLAUDE_API_KEY",
+  "OMNIROUTE_OPENCLAUDE_BASE_URL",
+  "OMNIROUTE_OPENCLAUDE_MODEL",
 ]);
 
 // Vars documented in ENVIRONMENT.md but intentionally absent from .env.example.

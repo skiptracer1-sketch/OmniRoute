@@ -253,6 +253,20 @@ export async function runAntigravityLogin(opts = {}, deps = {}) {
   return blob;
 }
 
+/**
+ * Link a ChatGPT/OpenAI account using OmniRoute's existing Codex device OAuth flow.
+ * This is intentionally a thin alias: auth, token persistence, and provider state
+ * remain owned by the existing Codex implementation rather than being duplicated.
+ */
+export async function runChatgptLogin(opts = {}, deps = {}) {
+  const startOAuth = deps.startOAuth ?? (await import("./oauth.mjs")).runOAuthStart;
+  return startOAuth({
+    provider: "codex",
+    browser: opts.browser,
+    timeout: opts.timeout ?? 300000,
+  });
+}
+
 async function runLoginAntigravity(opts) {
   try {
     await runAntigravityLogin({
@@ -268,10 +282,29 @@ async function runLoginAntigravity(opts) {
   }
 }
 
+async function runLoginChatgpt(opts) {
+  try {
+    await runChatgptLogin({
+      browser: opts.browser,
+      timeout: opts.timeout,
+    });
+  } catch (err) {
+    process.stderr.write(`\nChatGPT login failed: ${err?.message || err}\n`);
+    process.exit(1);
+  }
+}
+
 export function registerLogin(program) {
   const login = program
     .command("login")
     .description("Local OAuth helpers for remote OmniRoute installs (run on your own machine)");
+
+  login
+    .command("chatgpt")
+    .description("Link a ChatGPT/OpenAI account through OmniRoute's Codex OAuth flow")
+    .option("--no-browser", "Do not auto-open the browser; print the device URL instead")
+    .option("--timeout <ms>", "How long to wait for device authorization", (v) => parseInt(v, 10), 300000)
+    .action(runLoginChatgpt);
 
   login
     .command("antigravity")
