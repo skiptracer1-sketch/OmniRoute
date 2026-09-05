@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel';
+it('preserves requesting agent in approval record',()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['verify']}]});k.evaluateTool({missionId:m.id,agentId:'verification-1',resource:'x',action:'verify',risk:'high'});expect(k.listApprovals(m.id)[0]?.agentId).toBe('verification-1');});
