@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmCommandCenter } from '../../src/lumexus-swarm/package'; it('exports command center through package surface',()=>expect(LumexusSwarmCommandCenter).toBeDefined());
