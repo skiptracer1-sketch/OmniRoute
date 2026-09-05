@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel';
+it('timestamps approval records',()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['verify']}]});k.evaluateTool({missionId:m.id,agentId:'v',resource:'x',action:'verify',risk:'high'});expect(Date.parse(k.listApprovals(m.id)[0]!.createdAt)).not.toBeNaN();});
