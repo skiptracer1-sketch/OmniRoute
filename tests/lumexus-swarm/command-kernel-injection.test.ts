@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmCommandCenter } from '../../src/lumexus-swarm/api'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('supports injected kernel for composition',()=>{const k=new LumexusSwarmKernel();expect(new LumexusSwarmCommandCenter(k).kernel).toBe(k);});
