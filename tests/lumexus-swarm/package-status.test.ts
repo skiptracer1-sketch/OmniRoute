@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LUMEXUS_SWARM_V01_CAPABILITIES } from '../../src/lumexus-swarm/package'; it('exports safe capability manifest through package surface',()=>expect(LUMEXUS_SWARM_V01_CAPABILITIES.productionMutation).toBe(false));
