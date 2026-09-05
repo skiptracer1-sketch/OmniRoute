@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SECURITY_ROLES } from '../../src/lumexus-swarm/package'; it('exports seven security roles through package surface',()=>expect(SECURITY_ROLES).toHaveLength(7));
