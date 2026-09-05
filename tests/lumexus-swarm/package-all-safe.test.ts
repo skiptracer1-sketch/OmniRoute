@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LUMEXUS_SWARM_V01_CAPABILITIES as c, SECURITY_ROLES } from '../../src/lumexus-swarm/package'; it('loads v0.1 with seven roles and dangerous autonomy disabled',()=>{expect(SECURITY_ROLES).toHaveLength(7);expect(c.autonomousExploit).toBe(false);expect(c.productionMutation).toBe(false);});
