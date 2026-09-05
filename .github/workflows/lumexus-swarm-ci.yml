@@ -1,0 +1,33 @@
+name: Lumexus Native Swarm CI
+
+on:
+  pull_request:
+    paths:
+      - 'src/lumexus-swarm/**'
+      - 'tests/lumexus-swarm/**'
+      - '.github/workflows/lumexus-swarm-ci.yml'
+  push:
+    branches:
+      - 'feat/lumexus-native-swarm-v0.1'
+    paths:
+      - 'src/lumexus-swarm/**'
+      - 'tests/lumexus-swarm/**'
+      - '.github/workflows/lumexus-swarm-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck swarm kernel
+        run: npx tsc --noEmit --pretty false
+      - name: Test swarm kernel
+        run: npx vitest run tests/lumexus-swarm/kernel.test.ts
