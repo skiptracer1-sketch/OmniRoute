@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { SwarmApprovalBridge } from '../../src/lumexus-swarm/approval';
+it('surfaces Decision Queue adapter failures',async()=>{const b=new SwarmApprovalBridge({submit:async()=>{throw new Error('queue failed')}});await expect(b.submit({id:'a',missionId:'m',agentId:'v',resource:'x',action:'verify',risk:'high',reason:'x',createdAt:new Date().toISOString()})).rejects.toThrow('queue failed');});
