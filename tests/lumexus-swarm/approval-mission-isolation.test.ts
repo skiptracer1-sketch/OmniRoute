@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel';
+it('isolates approvals by mission', () => { const k=new LumexusSwarmKernel(); const s=[{resource:'x',actions:['verify']}]; const a=k.createMission({name:'a',objective:'x',scope:s}); const b=k.createMission({name:'b',objective:'x',scope:s}); k.evaluateTool({missionId:a.id,agentId:'v',resource:'x',action:'verify',risk:'high'}); expect(k.listApprovals(a.id)).toHaveLength(1); expect(k.listApprovals(b.id)).toHaveLength(0); });
