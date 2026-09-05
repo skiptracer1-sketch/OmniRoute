@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('fails closed when tool request references unknown mission',()=>expect(()=>new LumexusSwarmKernel().evaluateTool({missionId:'missing',agentId:'r',resource:'x',action:'inspect',risk:'low'})).toThrow('unknown mission'));
