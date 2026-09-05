@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel';
+it('retains a last event timestamp after approval escalation',()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['verify']}]});k.evaluateTool({missionId:m.id,agentId:'v',resource:'x',action:'verify',risk:'high'});expect(k.pulse(m.id).lastEventAt).toBeTruthy();});
