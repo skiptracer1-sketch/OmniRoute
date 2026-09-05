@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('rejects start for unknown mission',()=>expect(()=>new LumexusSwarmKernel().startMission('missing')).toThrow('unknown mission'));
