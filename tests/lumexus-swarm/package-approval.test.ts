@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SwarmApprovalBridge } from '../../src/lumexus-swarm/package'; it('exports Decision Queue bridge through package surface',()=>expect(SwarmApprovalBridge).toBeDefined());
