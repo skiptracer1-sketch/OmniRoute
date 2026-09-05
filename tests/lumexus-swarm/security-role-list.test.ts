@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SECURITY_ROLES } from '../../src/lumexus-swarm/types'; it('contains required verification and reporting roles',()=>{expect(SECURITY_ROLES).toContain('verification');expect(SECURITY_ROLES).toContain('reporting');});
