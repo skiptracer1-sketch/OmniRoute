@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LUMEXUS_NATIVE_SWARM_VERSION } from '../../src/lumexus-swarm/version'; it('uses semantic v0.1 identifier',()=>expect(LUMEXUS_NATIVE_SWARM_VERSION.split('.')).toHaveLength(3));
