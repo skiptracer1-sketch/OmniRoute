@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SecuritySwarmRuntime } from '../../src/lumexus-swarm/package'; it('exports Security Swarm runtime through package surface',()=>expect(SecuritySwarmRuntime).toBeDefined());
