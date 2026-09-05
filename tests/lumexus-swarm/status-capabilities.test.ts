@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LUMEXUS_SWARM_V01_CAPABILITIES as c } from '../../src/lumexus-swarm/status'; it('declares required v0.1 boundaries',()=>{expect(c.missionKernel&&c.blackboard&&c.eventFabric&&c.omniRouteAdapter&&c.toolGateway&&c.decisionQueueAdapter&&c.runtimePulseAdapter&&c.killSwitch).toBe(true);});
