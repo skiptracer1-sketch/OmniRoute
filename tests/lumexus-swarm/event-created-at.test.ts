@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('timestamps audit events',()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect']}]});expect(Date.parse(k.listEvents(m.id)[0]!.timestamp)).not.toBeNaN();});
