@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SECURITY_AGENT_REGISTRY } from '../../src/lumexus-swarm/security-registry'; it('contains exactly seven v0.1 security roles',()=>expect(Object.keys(SECURITY_AGENT_REGISTRY)).toHaveLength(7));
