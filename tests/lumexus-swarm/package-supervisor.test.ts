@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SecuritySwarmSupervisor } from '../../src/lumexus-swarm/package'; it('exports supervisor through package surface',()=>expect(SecuritySwarmSupervisor).toBeDefined());
