@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel';
+it('isolates finding counts by mission', () => { const k=new LumexusSwarmKernel(); const s=[{resource:'x',actions:['inspect']}]; const a=k.createMission({name:'a',objective:'x',scope:s}); const b=k.createMission({name:'b',objective:'x',scope:s}); k.recordFinding({missionId:a.id,agentId:'r',title:'x',severity:'low',evidence:['e']}); expect(k.pulse(a.id).findings).toBe(1); expect(k.pulse(b.id).findings).toBe(0); });
