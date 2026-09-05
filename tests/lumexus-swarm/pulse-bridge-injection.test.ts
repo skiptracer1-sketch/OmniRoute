@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SwarmRuntimePulseBridge } from '../../src/lumexus-swarm/runtime-pulse'; it('composes Runtime Pulse bridge with adapter',()=>expect(new SwarmRuntimePulseBridge({publish:()=>{}})).toBeDefined());
