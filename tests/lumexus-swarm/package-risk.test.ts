@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { requiresDecisionQueue } from '../../src/lumexus-swarm/package'; it('exports risk gate through package surface',()=>expect(requiresDecisionQueue('high')).toBe(true));
