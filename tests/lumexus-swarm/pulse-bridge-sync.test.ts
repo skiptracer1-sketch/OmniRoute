@@ -1,0 +1,2 @@
+import { expect, it, vi } from 'vitest'; import { SwarmRuntimePulseBridge } from '../../src/lumexus-swarm/runtime-pulse';
+it('supports synchronous pulse adapters',()=>{const publish=vi.fn();const b=new SwarmRuntimePulseBridge({publish});b.publish({missionId:'m',status:'created',agentCounts:{idle:7,running:0,blocked:0,completed:0,failed:0},findings:0,approvalsPending:0});expect(publish).toHaveBeenCalledOnce();});
