@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; import { SecuritySwarmRuntime } from '../../src/lumexus-swarm/runtime';
+it('surfaces OmniRoute routing failures',async()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect']}]});const r=new SecuritySwarmRuntime(k,{route:async()=>{throw new Error('route failed')}});await expect(r.routeAgent(m,'a','recon')).rejects.toThrow('route failed');});
