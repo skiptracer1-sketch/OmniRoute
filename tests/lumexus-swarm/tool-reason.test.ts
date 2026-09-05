@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel';
+it('returns an explicit reason for policy decisions',()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect']}]});expect(k.evaluateTool({missionId:m.id,agentId:'r',resource:'x',action:'inspect',risk:'low'}).reason.length).toBeGreaterThan(5);});
