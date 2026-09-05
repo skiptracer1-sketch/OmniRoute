@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { SwarmRuntimePulseBridge } from '../../src/lumexus-swarm/runtime-pulse';
+it('surfaces Runtime Pulse adapter failures',async()=>{const b=new SwarmRuntimePulseBridge({publish:async()=>{throw new Error('pulse failed')}});await expect(b.publish({missionId:'m',status:'created',agentCounts:{idle:7,running:0,blocked:0,completed:0,failed:0},findings:0,approvalsPending:0})).rejects.toThrow('pulse failed');});
