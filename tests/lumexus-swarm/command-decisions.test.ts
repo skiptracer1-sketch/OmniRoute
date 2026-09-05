@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmCommandCenter } from '../../src/lumexus-swarm/api';
+it('exposes pending decisions for a mission',()=>{const c=new LumexusSwarmCommandCenter();const m=c.createSecurityMission({name:'x',objective:'x',scope:[{resource:'x',actions:['verify']}]});c.kernel.evaluateTool({missionId:m.id,agentId:'v',resource:'x',action:'verify',risk:'high'});expect(c.pendingDecisions(m.id)).toHaveLength(1);});
