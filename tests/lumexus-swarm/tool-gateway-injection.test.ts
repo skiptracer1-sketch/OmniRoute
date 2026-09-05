@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; import { SwarmToolGateway } from '../../src/lumexus-swarm/tool-gateway'; it('composes gateway with bounded executor',()=>expect(new SwarmToolGateway(new LumexusSwarmKernel(),{execute:async()=>null})).toBeDefined());
