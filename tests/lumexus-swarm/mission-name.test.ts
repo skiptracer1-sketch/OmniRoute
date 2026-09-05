@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('preserves mission name',()=>expect(new LumexusSwarmKernel().createMission({name:'Authorized Sandbox',objective:'x',scope:[{resource:'x',actions:['inspect']}]}).name).toBe('Authorized Sandbox'));
