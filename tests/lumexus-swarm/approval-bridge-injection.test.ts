@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SwarmApprovalBridge } from '../../src/lumexus-swarm/approval'; it('composes Decision Queue bridge with adapter',()=>expect(new SwarmApprovalBridge({submit:async()=>({decisionId:'x'})})).toBeDefined());
