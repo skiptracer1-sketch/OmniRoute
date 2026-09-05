@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; import { SecuritySwarmRuntime } from '../../src/lumexus-swarm/runtime'; it('composes runtime with OmniRoute adapter',()=>expect(new SecuritySwarmRuntime(new LumexusSwarmKernel(),{route:async()=>({provider:'x',model:'y'})})).toBeDefined());
