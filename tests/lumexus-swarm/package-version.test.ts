@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LUMEXUS_NATIVE_SWARM_VERSION } from '../../src/lumexus-swarm/package'; it('exports v0.1 version through package surface',()=>expect(LUMEXUS_NATIVE_SWARM_VERSION).toBe('0.1.0'));
