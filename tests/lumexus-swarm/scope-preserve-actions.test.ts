@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('preserves explicit scope actions',()=>{const m=new LumexusSwarmKernel().createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect','report']}]});expect(m.scope[0]?.actions).toEqual(['inspect','report']);});
