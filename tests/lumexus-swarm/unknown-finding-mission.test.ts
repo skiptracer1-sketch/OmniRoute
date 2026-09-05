@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('rejects findings for unknown missions',()=>expect(()=>new LumexusSwarmKernel().recordFinding({missionId:'missing',agentId:'r',title:'x',severity:'low',evidence:['e']})).toThrow('unknown mission'));
