@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('starts with zero findings',()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect']}]});expect(k.pulse(m.id).findings).toBe(0);});
