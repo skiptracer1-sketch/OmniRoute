@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; it('preserves mission name in creation event payload',()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'alpha',objective:'x',scope:[{resource:'x',actions:['inspect']}]});expect(k.listEvents(m.id)[0]?.payload).toEqual({name:'alpha'});});
