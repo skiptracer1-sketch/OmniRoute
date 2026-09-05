@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { SwarmApprovalBridge } from '../../src/lumexus-swarm/approval';
+it('returns Decision Queue id from adapter',async()=>{const b=new SwarmApprovalBridge({submit:async()=>({decisionId:'dq-42'})});const r=await b.submit({id:'a',missionId:'m',agentId:'v',resource:'x',action:'verify',risk:'high',reason:'x',createdAt:new Date().toISOString()});expect(r.decisionId).toBe('dq-42');});
