@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { requiresDecisionQueue } from '../../src/lumexus-swarm/tool-risk'; it('classifies all four risk levels',()=>expect(['low','medium','high','critical'].map(x=>requiresDecisionQueue(x as any))).toEqual([false,false,true,true]));
