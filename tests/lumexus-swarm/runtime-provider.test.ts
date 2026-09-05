@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; import { SecuritySwarmRuntime } from '../../src/lumexus-swarm/runtime';
+it('returns OmniRoute provider selection',async()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect']}]});const r=await new SecuritySwarmRuntime(k,{route:async()=>({provider:'openai-compatible',model:'model-x'})}).routeAgent(m,'a','recon');expect(r.provider).toBe('openai-compatible');});
