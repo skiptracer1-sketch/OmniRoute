@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SwarmToolGateway } from '../../src/lumexus-swarm/package'; it('exports policy Tool Gateway through package surface',()=>expect(SwarmToolGateway).toBeDefined());
