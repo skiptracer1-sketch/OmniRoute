@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LUMEXUS_SWARM_V01_CAPABILITIES as c } from '../../src/lumexus-swarm/status'; it('declares dangerous autonomous capabilities disabled',()=>expect([c.autonomousExploit,c.productionMutation]).toEqual([false,false]));
