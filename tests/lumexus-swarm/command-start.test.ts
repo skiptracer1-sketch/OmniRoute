@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmCommandCenter } from '../../src/lumexus-swarm/api'; it('starts mission through command center',()=>{const c=new LumexusSwarmCommandCenter();const m=c.createSecurityMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect']}]});expect(c.start(m.id).status).toBe('running');});
