@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SwarmBlackboard } from '../../src/lumexus-swarm/blackboard'; it('returns empty list for missing blackboard key',()=>expect(new SwarmBlackboard().get('m','missing')).toEqual([]));
