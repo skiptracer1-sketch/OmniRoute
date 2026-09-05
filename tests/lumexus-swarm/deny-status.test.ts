@@ -1,0 +1,2 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel';
+it('does not escalate mission status for an out-of-scope denial',()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect']}]});k.startMission(m.id);k.evaluateTool({missionId:m.id,agentId:'r',resource:'y',action:'inspect',risk:'low'});expect(m.status).toBe('running');});
