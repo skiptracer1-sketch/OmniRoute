@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SECURITY_AGENT_REGISTRY } from '../../src/lumexus-swarm/package'; it('exports seven-role registry through package surface',()=>expect(Object.keys(SECURITY_AGENT_REGISTRY)).toHaveLength(7));
