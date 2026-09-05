@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { SECURITY_AGENT_REGISTRY } from '../../src/lumexus-swarm/security-registry'; it('limits high-risk request capability to two roles',()=>expect(Object.values(SECURITY_AGENT_REGISTRY).filter(x=>x.canRequestHighRisk)).toHaveLength(2));
