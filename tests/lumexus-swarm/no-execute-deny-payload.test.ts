@@ -1,0 +1,2 @@
+import { expect, it, vi } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/kernel'; import { SwarmToolGateway } from '../../src/lumexus-swarm/tool-gateway';
+it('never forwards denied payload to executor',async()=>{const k=new LumexusSwarmKernel();const m=k.createMission({name:'x',objective:'x',scope:[{resource:'x',actions:['inspect']}]});const execute=vi.fn();await new SwarmToolGateway(k,{execute}).execute({missionId:m.id,agentId:'r',resource:'y',action:'inspect',risk:'low',payload:{x:1}});expect(execute).not.toHaveBeenCalled();});
