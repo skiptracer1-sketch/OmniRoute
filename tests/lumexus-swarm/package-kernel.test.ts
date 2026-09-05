@@ -1,0 +1,1 @@
+import { expect, it } from 'vitest'; import { LumexusSwarmKernel } from '../../src/lumexus-swarm/package'; it('exports kernel through package surface',()=>expect(new LumexusSwarmKernel()).toBeDefined());
